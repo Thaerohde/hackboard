@@ -1,5 +1,6 @@
 package io.refugeescode.hackboard.domain;
 
+import lombok.Data;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -45,7 +46,7 @@ public class Project implements Serializable {
         name = "project_role_relation",
         joinColumns = {@JoinColumn(name = "project_id", referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    private List<ProjectRole> projectRoles;
+    private List<ProjectRole> projectRoles = new ArrayList<>();
 
 
     public List<String> getProject_story() {
@@ -62,14 +63,25 @@ public class Project implements Serializable {
     private List<String> project_story = new ArrayList<>();
 
 
-
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "project_tag_relation",
         joinColumns = {@JoinColumn(name = "project_id", referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")})
     private Set<Tag> tags;
+
+
+    @ManyToMany
+    private List<Application> applications =  new ArrayList<>();
+
+    public List<Application> getApplications() {
+        return applications;
+    }
+
+    public void setApplications(List<Application> applications) {
+        this.applications = applications;
+    }
+
 
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
@@ -164,5 +176,13 @@ public class Project implements Serializable {
 
     public void setProjectRoles(List<ProjectRole> projectRoles) {
         this.projectRoles = projectRoles;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 }

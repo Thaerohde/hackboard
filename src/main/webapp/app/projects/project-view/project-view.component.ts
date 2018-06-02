@@ -1,57 +1,43 @@
+import { ApplicationDto } from './../../api/model/applicationDto';
+import { ApplicationService } from './../../api/api/application.service';
 import { Component, OnInit } from '@angular/core';
 import { ProjectDto, ProjectService } from '../../api';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ProjectDtoRoles } from './../../api/model/projectDtoRoles';
-import { ProjectRoleService } from './../../api/api/projectRole.service';
 
 @Component({
   templateUrl: './project-view.component.html'
 })
 export class ProjectViewComponent implements OnInit {
-  data: ProjectDto = { id: 0, title: '', description: '', github: '' };
-  roleData: ProjectDtoRoles = { roleName: '', color: '' };
-  roles: Array<any>;
-  value: any;
-
+  project: ProjectDto = { id: 0, title: '', description: '' };
+  applicant: ApplicationDto = { applicant: 0, projectId: 0, roleId: 0 };
   constructor(
-    private projectRoleService: ProjectRoleService,
     private projectService: ProjectService,
+    private applicationService: ApplicationService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit() {
     const id = parseInt(this.route.snapshot.paramMap.get('id'), 10);
-    this.projectService.viewProject(id).subscribe(project => {
-      this.data = project;
-    });
-    this.projectRoleService
-      .listProjectRoles()
-      .subscribe(projectRoles => (this.roles = projectRoles));
+    this.projectService.viewProject(id).subscribe(project => (this.project = project));
   }
+
+  getFilledArray(count) {
+    return Array(count).fill(true);
+  }
+
   delete() {
     this.projectService
-      .deleteProject(this.data.id)
+      .deleteProject(this.project.id)
       .subscribe(() => this.router.navigate(['/projects']));
   }
-
-  selected(value: any): void {
-    console.log('Selected value is: ', value);
-  }
-
-  removed(value: any): void {
-    console.log('Removed value is: ', value);
-  }
-
-  refreshValue(value: any): void {
-    this.value = value;
-  }
-
-  rolesToString(value: Array<any> = []): string {
-    return value
-      .map((item: any) => {
-        return item.text;
-      })
-      .join(',');
+  apply(rolename) {
+    this.applicant.projectId = this.project.id;
+    console.log(this.applicant.projectId);
+    this.applicant.roleId = 4;
+    this.applicant.applicant = 3;
+    this.applicationService
+      .addapplication(this.applicant)
+      .subscribe(() => this.router.navigate(['/projects']));
   }
 }

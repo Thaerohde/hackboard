@@ -4,8 +4,10 @@ import io.refugeescode.hackboard.domain.Project;
 import io.refugeescode.hackboard.domain.ProjectRole;
 import io.refugeescode.hackboard.repository.ProjectRoleRepository;
 import io.refugeescode.hackboard.repository.UserRepository;
+import io.refugeescode.hackboard.service.dto.ApplicationDto;
 import io.refugeescode.hackboard.service.dto.ProjectDto;
 import io.refugeescode.hackboard.service.dto.ProjectRoleDto;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,7 @@ public class ProjectMappers {
             List<ProjectRoleDto> collect = project.getProjectRoles().stream()
                 .map(e -> convertToProjectDTORoles(e)).collect(Collectors.toList());
 
+
             boolean found= false;
             Integer itemIndex = 0;
             List<ProjectRoleDto> dtoRolesSet = new ArrayList<>();
@@ -54,6 +57,9 @@ public class ProjectMappers {
                 }
                 if (found == true){
                     ProjectRoleDto projectDtoRoles = dtoRolesSet.get(itemIndex);
+                    Optional<ProjectRole> oneByRoleName = projectRoleRepository.findOneByRoleName(projectDtoRoles.getRoleName());
+                    if (oneByRoleName.isPresent())
+                        projectDtoRoles.setId(oneByRoleName.get().getId());
                     projectDtoRoles.setRoleName(projectDtoRoles.getRoleName());
                     projectDtoRoles.setColor(projectDtoRoles.getColor());
                     projectDtoRoles.setCount(projectDtoRoles.getCount()+1);
@@ -61,14 +67,19 @@ public class ProjectMappers {
                 }
                 else{
                     ProjectRoleDto projectDtoRoles = new ProjectRoleDto();
+                    Optional<ProjectRole> oneByRoleName = projectRoleRepository.findOneByRoleName(projectDtoRoles.getRoleName());
+                    if (oneByRoleName.isPresent())
+                        projectDtoRoles.setId(oneByRoleName.get().getId());
                     projectDtoRoles.setColor(item.getColor());
                     projectDtoRoles.setRoleName(item.getRoleName());
                     projectDtoRoles.setCount(1L);
                     dtoRolesSet.add(projectDtoRoles);
                 }
-                ;
+
             }
             projectDto.setProjectRole(dtoRolesSet);
+
+
             return projectDto;
         }
     }
